@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mkamrul9/spotsync-api/dto"
@@ -41,4 +42,19 @@ func (h *ZoneHandler) GetAllZones(c echo.Context) error {
 	}
 
 	return utils.SendSuccess(c, http.StatusOK, "Parking zones retrieved successfully", res)
+}
+
+func (h *ZoneHandler) GetZoneByID(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		return utils.SendError(c, http.StatusBadRequest, "Invalid zone ID", nil)
+	}
+
+	res, err := h.zoneService.GetZoneByID(uint(id))
+	if err != nil {
+		return utils.SendError(c, http.StatusNotFound, "Zone not found", err.Error())
+	}
+
+	return utils.SendSuccess(c, http.StatusOK, "Parking zone retrieved successfully", res)
 }

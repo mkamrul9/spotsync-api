@@ -9,6 +9,7 @@ import (
 type ZoneService interface {
 	CreateZone(req dto.CreateZoneRequest) (*dto.ZoneResponse, error)
 	GetAllZones() ([]dto.ZoneResponse, error)
+	GetZoneByID(id uint) (*dto.ZoneResponse, error)
 }
 
 type zoneService struct {
@@ -67,4 +68,24 @@ func (s *zoneService) GetAllZones() ([]dto.ZoneResponse, error) {
 	}
 
 	return response, nil
+}
+
+func (s *zoneService) GetZoneByID(id uint) (*dto.ZoneResponse, error) {
+	z, err := s.zoneRepo.GetZoneByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	activeCount, _ := s.resRepo.GetActiveReservationCountByZone(z.ID)
+	available := z.TotalCapacity - int(activeCount)
+
+	return &dto.ZoneResponse{
+		ID:             z.ID,
+		Name:           z.Name,
+		Type:           z.Type,
+		TotalCapacity:  z.TotalCapacity,
+		AvailableSpots: available,
+		PricePerHour:   z.PricePerHour,
+		CreatedAt:      z.CreatedAt.Format("2006-01-02T15:04:05Z"),
+	}, nil
 }
