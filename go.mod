@@ -1,4 +1,4 @@
-module github.com/yourusername/spotsync-api
+module github.com/mkamrul9/spotsync-api
 
 go 1.25.2
 
