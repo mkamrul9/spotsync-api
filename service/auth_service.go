@@ -10,7 +10,7 @@ import (
 )
 
 type AuthService interface {
-	Register(req dto.RegisterRequest) (*dto.AuthResponse, error)
+	Register(req dto.RegisterRequest) (*dto.RegisterResponse, error)
 	Login(req dto.LoginRequest) (*dto.AuthResponse, error)
 }
 
@@ -22,7 +22,7 @@ func NewAuthService(userRepo repository.UserRepository) AuthService {
 	return &authService{userRepo}
 }
 
-func (s *authService) Register(req dto.RegisterRequest) (*dto.AuthResponse, error) {
+func (s *authService) Register(req dto.RegisterRequest) (*dto.RegisterResponse, error) {
 	// 1. Hash password
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
@@ -48,13 +48,13 @@ func (s *authService) Register(req dto.RegisterRequest) (*dto.AuthResponse, erro
 		return nil, errors.New("email already exists or database error")
 	}
 
-	return &dto.AuthResponse{
-		User: dto.UserSummary{
-			ID:    user.ID,
-			Name:  user.Name,
-			Email: user.Email,
-			Role:  user.Role,
-		},
+	return &dto.RegisterResponse{
+		ID:        user.ID,
+		Name:      user.Name,
+		Email:     user.Email,
+		Role:      user.Role,
+		CreatedAt: user.CreatedAt.Format("2006-01-02T15:04:05Z"),
+		UpdatedAt: user.UpdatedAt.Format("2006-01-02T15:04:05Z"),
 	}, nil
 }
 

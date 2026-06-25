@@ -7,7 +7,7 @@ import (
 )
 
 type ZoneService interface {
-	CreateZone(req dto.CreateZoneRequest) (*dto.ZoneResponse, error)
+	CreateZone(req dto.CreateZoneRequest) (*dto.CreateZoneResponse, error)
 	GetAllZones() ([]dto.ZoneResponse, error)
 	GetZoneByID(id uint) (*dto.ZoneResponse, error)
 }
@@ -21,7 +21,7 @@ func NewZoneService(zoneRepo repository.ZoneRepository, resRepo repository.Reser
 	return &zoneService{zoneRepo, resRepo}
 }
 
-func (s *zoneService) CreateZone(req dto.CreateZoneRequest) (*dto.ZoneResponse, error) {
+func (s *zoneService) CreateZone(req dto.CreateZoneRequest) (*dto.CreateZoneResponse, error) {
 	zone := models.ParkingZone{
 		Name:          req.Name,
 		Type:          req.Type,
@@ -33,14 +33,14 @@ func (s *zoneService) CreateZone(req dto.CreateZoneRequest) (*dto.ZoneResponse, 
 		return nil, err
 	}
 
-	return &dto.ZoneResponse{
-		ID:             zone.ID,
-		Name:           zone.Name,
-		Type:           zone.Type,
-		TotalCapacity:  zone.TotalCapacity,
-		AvailableSpots: zone.TotalCapacity, // New zone, so all spots are available
-		PricePerHour:   zone.PricePerHour,
-		CreatedAt:      zone.CreatedAt.Format("2006-01-02T15:04:05Z"),
+	return &dto.CreateZoneResponse{
+		ID:            zone.ID,
+		Name:          zone.Name,
+		Type:          zone.Type,
+		TotalCapacity: zone.TotalCapacity,
+		PricePerHour:  zone.PricePerHour,
+		CreatedAt:     zone.CreatedAt.Format("2006-01-02T15:04:05Z"),
+		UpdatedAt:     zone.UpdatedAt.Format("2006-01-02T15:04:05Z"),
 	}, nil
 }
 

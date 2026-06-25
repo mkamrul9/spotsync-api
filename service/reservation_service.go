@@ -9,10 +9,10 @@ import (
 )
 
 type ReservationService interface {
-	CreateReservation(userID uint, req dto.CreateReservationRequest) (*dto.ReservationResponse, error)
+	CreateReservation(userID uint, req dto.CreateReservationRequest) (*dto.CreateReservationResponse, error)
 	GetMyReservations(userID uint) ([]dto.ReservationResponse, error)
 	CancelReservation(userID uint, reservationID uint, role string) error
-	GetAllSystemReservations() ([]dto.ReservationResponse, error)
+	GetAllSystemReservations() ([]dto.AdminReservationResponse, error)
 }
 
 type reservationService struct {
@@ -23,7 +23,7 @@ func NewReservationService(resRepo repository.ReservationRepository) Reservation
 	return &reservationService{resRepo}
 }
 
-func (s *reservationService) CreateReservation(userID uint, req dto.CreateReservationRequest) (*dto.ReservationResponse, error) {
+func (s *reservationService) CreateReservation(userID uint, req dto.CreateReservationRequest) (*dto.CreateReservationResponse, error) {
 	res := models.Reservation{
 		UserID:       userID,
 		ZoneID:       req.ZoneID,
@@ -36,11 +36,14 @@ func (s *reservationService) CreateReservation(userID uint, req dto.CreateReserv
 		return nil, err
 	}
 
-	return &dto.ReservationResponse{
+	return &dto.CreateReservationResponse{
 		ID:           res.ID,
+		UserID:       res.UserID,
+		ZoneID:       res.ZoneID,
 		LicensePlate: res.LicensePlate,
 		Status:       res.Status,
 		CreatedAt:    res.CreatedAt.Format("2006-01-02T15:04:05Z"),
+		UpdatedAt:    res.UpdatedAt.Format("2006-01-02T15:04:05Z"),
 	}, nil
 }
 
@@ -81,18 +84,23 @@ func (s *reservationService) CancelReservation(userID uint, reservationID uint, 
 	return s.resRepo.UpdateReservationStatus(res, "cancelled")
 }
 
-func (s *reservationService) GetAllSystemReservations() ([]dto.ReservationResponse, error) {
+func (s *reservationService) GetAllSystemReservations() ([]dto.AdminReservationResponse, error) {
 	reservations, err := s.resRepo.GetAllReservations()
 	if err != nil {
 		return nil, err
 	}
 
-	var response []dto.ReservationResponse
+	var response []dto.AdminReservationResponse
 	for _, r := range reservations {
-		response = append(response, dto.ReservationResponse{
+		response = append(response, dto.AdminReservationResponse{
 			ID:           r.ID,
 			LicensePlate: r.LicensePlate,
 			Status:       r.Status,
+			User: dto.UserSummary{
+				ID:    r.User.ID,
+				Name:  r.User.Name,
+				Email: r.User.Email,
+			},
 			Zone: dto.ZoneSummary{
 				ID:   r.Zone.ID,
 				Name: r.Zone.Name,

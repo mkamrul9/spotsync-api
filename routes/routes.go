@@ -18,7 +18,7 @@ func SetupRoutes(
 	api.POST("/auth/register", authHandler.Register)
 	api.POST("/auth/login", authHandler.Login)
 	api.GET("/zones", zoneHandler.GetAllZones)
-	// (Note: Implement handler.GetZoneByID if you haven't yet, and wire it here)
+	api.GET("/zones/:id", zoneHandler.GetZoneByID)
 
 	// 🔹 Authenticated Routes (Requires valid JWT)
 	authGroup := api.Group("", middleware.JWTMiddleware)
