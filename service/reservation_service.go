@@ -12,6 +12,7 @@ type ReservationService interface {
 	CreateReservation(userID uint, req dto.CreateReservationRequest) (*dto.ReservationResponse, error)
 	GetMyReservations(userID uint) ([]dto.ReservationResponse, error)
 	CancelReservation(userID uint, reservationID uint, role string) error
+	GetAllSystemReservations() ([]dto.ReservationResponse, error)
 }
 
 type reservationService struct {
@@ -78,4 +79,27 @@ func (s *reservationService) CancelReservation(userID uint, reservationID uint, 
 	}
 
 	return s.resRepo.UpdateReservationStatus(res, "cancelled")
+}
+
+func (s *reservationService) GetAllSystemReservations() ([]dto.ReservationResponse, error) {
+	reservations, err := s.resRepo.GetAllReservations()
+	if err != nil {
+		return nil, err
+	}
+
+	var response []dto.ReservationResponse
+	for _, r := range reservations {
+		response = append(response, dto.ReservationResponse{
+			ID:           r.ID,
+			LicensePlate: r.LicensePlate,
+			Status:       r.Status,
+			Zone: dto.ZoneSummary{
+				ID:   r.Zone.ID,
+				Name: r.Zone.Name,
+				Type: r.Zone.Type,
+			},
+			CreatedAt: r.CreatedAt.Format("2006-01-02T15:04:05Z"),
+		})
+	}
+	return response, nil
 }

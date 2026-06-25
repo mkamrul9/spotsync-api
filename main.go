@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/mkamrul9/spotsync-api/config"
 	"github.com/mkamrul9/spotsync-api/handler"
@@ -27,6 +28,14 @@ func main() {
 
 	// 3. Setup Echo framework & Custom Validator
 	e := echo.New()
+
+	// CORS Middleware (Crucial for frontend integration)
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"}, // Change this to your frontend URL in production
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+	}))
+
 	e.Validator = &utils.CustomValidator{Validator: validator.New()}
 
 	// ==========================================

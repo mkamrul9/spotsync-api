@@ -33,5 +33,5 @@ func SetupRoutes(
 
 	// Zones
 	adminGroup.POST("/zones", zoneHandler.CreateZone)
-	// adminGroup.GET("/reservations", resHandler.GetAllReservations) // (Wire if implemented)
+	adminGroup.GET("/reservations", resHandler.GetAllReservations) // Now wired!
 }

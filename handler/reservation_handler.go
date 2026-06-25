@@ -79,3 +79,11 @@ func (h *ReservationHandler) CancelReservation(c echo.Context) error {
 
 	return utils.SendSuccess(c, http.StatusOK, "Reservation cancelled successfully", nil)
 }
+
+func (h *ReservationHandler) GetAllReservations(c echo.Context) error {
+	res, err := h.resService.GetAllSystemReservations()
+	if err != nil {
+		return utils.SendError(c, http.StatusInternalServerError, "Failed to fetch all reservations", err.Error())
+	}
+	return utils.SendSuccess(c, http.StatusOK, "All reservations retrieved", res)
+}
