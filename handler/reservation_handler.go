@@ -77,7 +77,10 @@ func (h *ReservationHandler) CancelReservation(c echo.Context) error {
 		return utils.SendError(c, http.StatusNotFound, "Failed to cancel reservation", err.Error())
 	}
 
-	return utils.SendSuccess(c, http.StatusOK, "Reservation cancelled successfully", nil)
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"message": "Reservation cancelled successfully",
+	})
 }
 
 func (h *ReservationHandler) GetAllReservations(c echo.Context) error {
@@ -85,5 +88,5 @@ func (h *ReservationHandler) GetAllReservations(c echo.Context) error {
 	if err != nil {
 		return utils.SendError(c, http.StatusInternalServerError, "Failed to fetch all reservations", err.Error())
 	}
-	return utils.SendSuccess(c, http.StatusOK, "All reservations retrieved", res)
+	return utils.SendSuccess(c, http.StatusOK, "All reservations retrieved successfully", res)
 }
