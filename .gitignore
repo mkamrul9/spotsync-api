@@ -15,3 +15,5 @@ test.ps1
 # OS files
 .DS_Store
 Thumbs.db
+audit_report.md
+./audit_report.md
