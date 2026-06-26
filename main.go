@@ -39,6 +39,10 @@ func main() {
 
 	e.Validator = &utils.CustomValidator{Validator: validator.New()}
 
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Welcome to SpotSync API! 🚗⚡")
+	})
+
 	// ==========================================
 	// 4. DEPENDENCY INJECTION (Strictly Wired)
 	// ==========================================
