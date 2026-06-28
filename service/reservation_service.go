@@ -100,6 +100,7 @@ func (s *reservationService) GetAllSystemReservations() ([]dto.AdminReservationR
 				ID:    r.User.ID,
 				Name:  r.User.Name,
 				Email: r.User.Email,
+				Role:  r.User.Role, // populate role from preloaded user
 			},
 			Zone: dto.ZoneSummary{
 				ID:   r.Zone.ID,
