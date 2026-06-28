@@ -8,6 +8,15 @@ type CreateZoneRequest struct {
 	PricePerHour  float64 `json:"price_per_hour" validate:"required,gt=0"`
 }
 
+// UpdateZoneRequest defines the payload for admins updating an existing parking zone.
+// All fields are optional — only provided fields are updated.
+type UpdateZoneRequest struct {
+	Name          *string  `json:"name" validate:"omitempty,min=1"`
+	Type          *string  `json:"type" validate:"omitempty,oneof=general ev_charging covered"`
+	TotalCapacity *int     `json:"total_capacity" validate:"omitempty,gt=0"`
+	PricePerHour  *float64 `json:"price_per_hour" validate:"omitempty,gt=0"`
+}
+
 // ZoneResponse defines the payload returned to users
 type ZoneResponse struct {
 	ID             uint    `json:"id"`

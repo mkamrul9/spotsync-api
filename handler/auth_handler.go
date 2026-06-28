@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -28,7 +29,10 @@ func (h *AuthHandler) Register(c echo.Context) error {
 
 	res, err := h.authService.Register(req)
 	if err != nil {
-		return utils.SendError(c, http.StatusConflict, "Registration failed", err.Error())
+		if errors.Is(err, service.ErrEmailTaken) {
+			return utils.SendError(c, http.StatusConflict, "Registration failed", err.Error())
+		}
+		return utils.SendError(c, http.StatusInternalServerError, "Registration failed", err.Error())
 	}
 
 	return utils.SendSuccess(c, http.StatusCreated, "User registered successfully", res)

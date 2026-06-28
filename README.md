@@ -3,7 +3,6 @@
 SpotSync is a centralized backend REST API designed for busy airports and malls to manage parking zones, specifically handling the high-demand reservation of limited EV charging spots.
 
 **Live API URL:** [https://spotsync-api.onrender.com](https://spotsync-api.onrender.com)  
-**Interview Video:** *[Insert your YouTube Link here]*
 
 ---
 
@@ -68,16 +67,19 @@ db.Transaction(func(tx *gorm.DB) error {
 ## 🚀 Local Development Setup
 
 ### Prerequisites
+
 - Go 1.22+ installed
 - PostgreSQL database (local, NeonDB, or Supabase)
 
 ### 1. Clone the repository
+
 ```bash
 git clone https://github.com/mkamrul9/spotsync-api.git
 cd spotsync-api
 ```
 
 ### 2. Create your `.env` file
+
 ```env
 PORT=8080
 DB_URL=postgres://user:password@host:port/dbname?sslmode=require
@@ -85,6 +87,7 @@ JWT_SECRET=your_super_secret_jwt_key
 ```
 
 ### 3. Install dependencies & run
+
 ```bash
 go mod tidy
 go run main.go
@@ -97,6 +100,7 @@ go run main.go
 ## 🌐 API Endpoints
 
 ### 🔓 Public Routes
+
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/` | Welcome message |
@@ -107,6 +111,7 @@ go run main.go
 | `GET` | `/api/v1/zones/:id` | Get a single parking zone by ID |
 
 ### 🔐 Authenticated Routes (Requires `Authorization: Bearer <token>`)
+
 | Method | Endpoint | Description |
 |---|---|---|
 | `POST` | `/api/v1/reservations` | Reserve a parking spot |
@@ -114,9 +119,12 @@ go run main.go
 | `DELETE` | `/api/v1/reservations/:id` | Cancel your reservation |
 
 ### 🛡️ Admin-Only Routes (Requires JWT + `admin` role)
+
 | Method | Endpoint | Description |
 |---|---|---|
 | `POST` | `/api/v1/zones` | Create a new parking zone |
+| `PUT` | `/api/v1/zones/:id` | Update an existing parking zone (partial update) |
+| `DELETE` | `/api/v1/zones/:id` | Delete a parking zone |
 | `GET` | `/api/v1/reservations` | View all reservations in the system |
 
 ---
@@ -126,6 +134,7 @@ go run main.go
 All responses follow a consistent structure:
 
 **Success:**
+
 ```json
 {
   "success": true,
@@ -135,6 +144,7 @@ All responses follow a consistent structure:
 ```
 
 **Error:**
+
 ```json
 {
   "success": false,
@@ -144,6 +154,7 @@ All responses follow a consistent structure:
 ```
 
 ### HTTP Status Codes
+
 | Code | Meaning |
 |---|---|
 | `200` | OK — Successful GET/DELETE |

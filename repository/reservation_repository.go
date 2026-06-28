@@ -15,6 +15,8 @@ type ReservationRepository interface {
 	UpdateReservationStatus(reservation *models.Reservation, status string) error
 	GetAllReservations() ([]models.Reservation, error)
 	GetActiveReservationCountByZone(zoneID uint) (int64, error)
+	// GetActiveCountsPerZone returns a map[zoneID]activeCount in a single query.
+	GetActiveCountsPerZone() (map[uint]int64, error)
 }
 
 type reservationRepository struct {
@@ -88,4 +90,29 @@ func (r *reservationRepository) GetActiveReservationCountByZone(zoneID uint) (in
 		Where("zone_id = ? AND status = ?", zoneID, "active").
 		Count(&count).Error
 	return count, err
+}
+
+// GetActiveCountsPerZone fetches all active reservation counts grouped by zone_id in a
+// single SQL query (SELECT zone_id, COUNT(*) … GROUP BY zone_id), eliminating N+1 queries.
+func (r *reservationRepository) GetActiveCountsPerZone() (map[uint]int64, error) {
+	type result struct {
+		ZoneID uint
+		Count  int64
+	}
+
+	var rows []result
+	err := r.db.Model(&models.Reservation{}).
+		Select("zone_id, COUNT(*) as count").
+		Where("status = ?", "active").
+		Group("zone_id").
+		Scan(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+
+	counts := make(map[uint]int64, len(rows))
+	for _, row := range rows {
+		counts[row.ZoneID] = row.Count
+	}
+	return counts, nil
 }

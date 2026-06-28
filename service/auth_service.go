@@ -3,11 +3,15 @@ package service
 import (
 	"errors"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/mkamrul9/spotsync-api/dto"
 	"github.com/mkamrul9/spotsync-api/models"
 	"github.com/mkamrul9/spotsync-api/repository"
 	"github.com/mkamrul9/spotsync-api/utils"
 )
+
+// ErrEmailTaken is returned when the email already exists in the database.
+var ErrEmailTaken = errors.New("email already in use")
 
 type AuthService interface {
 	Register(req dto.RegisterRequest) (*dto.RegisterResponse, error)
@@ -45,7 +49,12 @@ func (s *authService) Register(req dto.RegisterRequest) (*dto.RegisterResponse, 
 
 	// 4. Save via Repository
 	if err := s.userRepo.CreateUser(&user); err != nil {
-		return nil, errors.New("email already exists or database error")
+		// Detect PostgreSQL unique-constraint violation (code 23505)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return nil, ErrEmailTaken
+		}
+		return nil, errors.New("database error: could not create user")
 	}
 
 	return &dto.RegisterResponse{

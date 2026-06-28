@@ -44,7 +44,7 @@ func main() {
 	})
 
 	// ==========================================
-	// 4. DEPENDENCY INJECTION (Strictly Wired)
+	// 4. DEPENDENCY INJECTION
 	// ==========================================
 
 	// Repositories

@@ -58,3 +58,43 @@ func (h *ZoneHandler) GetZoneByID(c echo.Context) error {
 
 	return utils.SendSuccess(c, http.StatusOK, "Parking zone retrieved successfully", res)
 }
+
+func (h *ZoneHandler) UpdateZone(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		return utils.SendError(c, http.StatusBadRequest, "Invalid zone ID", nil)
+	}
+
+	var req dto.UpdateZoneRequest
+	if err := c.Bind(&req); err != nil {
+		return utils.SendError(c, http.StatusBadRequest, "Invalid request payload", err.Error())
+	}
+	if err := c.Validate(&req); err != nil {
+		return utils.SendError(c, http.StatusBadRequest, "Validation failed", err.Error())
+	}
+
+	res, err := h.zoneService.UpdateZone(uint(id), req)
+	if err != nil {
+		return utils.SendError(c, http.StatusNotFound, "Zone not found or update failed", err.Error())
+	}
+
+	return utils.SendSuccess(c, http.StatusOK, "Parking zone updated successfully", res)
+}
+
+func (h *ZoneHandler) DeleteZone(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		return utils.SendError(c, http.StatusBadRequest, "Invalid zone ID", nil)
+	}
+
+	if err := h.zoneService.DeleteZone(uint(id)); err != nil {
+		return utils.SendError(c, http.StatusNotFound, "Zone not found", err.Error())
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"message": "Parking zone deleted successfully",
+	})
+}

@@ -14,13 +14,13 @@ func SetupRoutes(
 ) {
 	api := e.Group("/api/v1")
 
-	// 🔹 Public Routes
+	//  Public Routes
 	api.POST("/auth/register", authHandler.Register)
 	api.POST("/auth/login", authHandler.Login)
 	api.GET("/zones", zoneHandler.GetAllZones)
 	api.GET("/zones/:id", zoneHandler.GetZoneByID)
 
-	// 🔹 Authenticated Routes (Requires valid JWT)
+	//  Authenticated Routes (Requires valid JWT)
 	authGroup := api.Group("", middleware.JWTMiddleware)
 
 	// Reservations
@@ -28,10 +28,12 @@ func SetupRoutes(
 	authGroup.GET("/reservations/my-reservations", resHandler.GetMyReservations)
 	authGroup.DELETE("/reservations/:id", resHandler.CancelReservation)
 
-	// 🔹 Admin-Only Routes (Requires valid JWT AND 'admin' role)
+	//  Admin-Only Routes (Requires valid JWT AND 'admin' role)
 	adminGroup := authGroup.Group("", middleware.AdminOnlyMiddleware)
 
-	// Zones
+	// Zones (Admin)
 	adminGroup.POST("/zones", zoneHandler.CreateZone)
-	adminGroup.GET("/reservations", resHandler.GetAllReservations) // Now wired!
+	adminGroup.PUT("/zones/:id", zoneHandler.UpdateZone)
+	adminGroup.DELETE("/zones/:id", zoneHandler.DeleteZone)
+	adminGroup.GET("/reservations", resHandler.GetAllReservations)
 }
